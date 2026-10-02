@@ -1,0 +1,9 @@
+node_modules/
+dist/
+release/
+screenshots/
+*.log
+*.plano
+.env
+.env.*
+!.env.example

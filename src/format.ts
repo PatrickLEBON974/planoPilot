@@ -1,0 +1,11 @@
+const numberFormats = new Map<number, Intl.NumberFormat>();
+export const number = (value: number, digits = 0) => { if (!numberFormats.has(digits)) numberFormats.set(digits, new Intl.NumberFormat('fr-FR', { maximumFractionDigits: digits, minimumFractionDigits: digits })); return numberFormats.get(digits)!.format(value); };
+export const percent = (value: number) => `${number(value * 100, 1)} %`;
+const moneyFormat = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2 });
+export const money = (value: number) => moneyFormat.format(value);
+export const salesText = (value: number, metric: SalesMetric) => metric === 'catalog' ? 'Non renseigné' : metric === 'revenue' ? money(value) : `${number(value, value % 1 ? 2 : 0)} ventes`;
+const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
+export const dateText = (value: string) => dateFormat.format(new Date(value));
+export const groupingLabels = { segment: 'Segments', subsegment: 'Sous-segments', brand: 'Marques', sku: 'Références' };
+export const modeLabels = { mass: 'En descente', blocks: 'Par blocs', articles: 'À l’article' };
+import type { SalesMetric } from './types.ts';

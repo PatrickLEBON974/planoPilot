@@ -1,0 +1,4 @@
+Référence;Produit;Marque;Segment;Sous-segment;CA;Quantité;Notre référence
+T1;Tomates;Maison;Légumes;Tomates;1234,56;10;oui
+T2;Tomates;Autre;Légumes;Tomates;pas un montant;20;non
+M1;Maïs;Autre;Légumes;Maïs;500,25;5;non
