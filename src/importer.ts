@@ -22,7 +22,7 @@ export const fields: { key: Field; label: string; required?: boolean; aliases: s
   { key: 'subsegment', label: 'Sous-segment', aliases: ['sous segment', 'subsegment', 'sous categorie'] },
   { key: 'sales', label: 'Chiffre d’affaires / ventes', required: true, aliases: ['ca', 'chiffre d affaires', 'ventes', 'sales', 'revenue', 'valeur'] },
   { key: 'quantity', label: 'Quantité', aliases: ['quantite', 'quantity', 'volume', 'unites'] },
-  { key: 'ours', label: 'Notre référence', aliases: ['notre reference', 'ours', 'interne', 'appartenance', 'concurrent'] },
+  { key: 'ours', label: 'Référence interne', aliases: ['reference interne', 'notre reference', 'ours', 'interne', 'appartenance', 'concurrent'] },
   { key: 'packaging', label: 'Conditionnement', aliases: ['conditionnement', 'format', 'packaging'] },
   { key: 'sourceUrl', label: 'Source du produit', aliases: ['source', 'source url', 'url source', 'url produit'] },
   { key: 'supplier', label: 'Fournisseur', aliases: ['fournisseur', 'supplier'] },
@@ -67,7 +67,7 @@ export function mapProducts(rows: string[][], headerIndex: number, mapping: Mapp
     if (seen.has(sku)) { duplicates++; if (mode === 'catalog') return; } seen.add(sku);
     const oursValue = plain(get('ours'));
     const competitorColumn = plain(headers[mapping.ours] || '') === 'concurrent';
-    const isTrue = ['true', 'vrai', 'oui', 'yes', '1', 'notre reference', 'interne', 'notre marque', 'nous'].includes(oursValue);
+    const isTrue = ['true', 'vrai', 'oui', 'yes', '1', 'reference interne', 'notre reference', 'interne', 'notre marque', 'nous'].includes(oursValue);
     const isFalse = ['false', 'faux', 'non', 'no', '0', 'concurrent', 'externe', 'competitor'].includes(oursValue);
     const ours = mapping.ours < 0 || (!isTrue && !isFalse) ? null : competitorColumn ? !isTrue : isTrue;
     products.push({ id: uid(), sku, name: get('name'), brand: get('brand'), segment: get('segment'), subsegment: get('subsegment') || 'Non renseigné', sales, ...(quantity !== null ? { quantity } : {}), ours, ...(get('packaging') ? { packaging: get('packaging') } : {}), ...(get('sourceUrl') ? { sourceUrl: get('sourceUrl') } : {}), ...(get('supplier') ? { supplier: get('supplier') } : {}), ...(get('notes') ? { notes: get('notes') } : {}) });

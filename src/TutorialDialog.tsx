@@ -11,33 +11,33 @@ const steps = [
   },
   {
     label: 'Importer', title: 'Commencez avec vos données',
-    description: 'Dans la colonne gauche, cliquez sur « Importer un fichier ». Les formats CSV et Excel (.xlsx) sont acceptés.',
-    points: ['Avec Excel, choisissez l’onglet et la ligne des en-têtes.', 'Associez les colonnes : produit, marque, segment et ventes.', 'Choisissez le périmètre à implanter après l’import.'],
-    tip: 'Vérifiez la mesure choisie : chiffre d’affaires ou quantités vendues. Les lignes invalides sont signalées avant l’import.',
+    description: window.plano ? 'Dans Fichier → Importer dans le plan, choisissez des données de ventes ou un catalogue. Les formats CSV et Excel (.xlsx) sont acceptés.' : 'Cliquez sur « Importer mes données » à l’accueil ou sur « Importer un fichier » dans les paramètres. Les formats CSV et Excel (.xlsx) sont acceptés.',
+    points: ['Avec Excel, choisissez l’onglet et la ligne des en-têtes.', 'Associez les colonnes : produit, marque, segment et ventes si disponibles.', 'Choisissez le périmètre à implanter après l’import.'],
+    tip: 'Le chiffre d’affaires est proposé par défaut. Choisissez les ventes en unités ou un catalogue sans ventes si nécessaire. Les lignes invalides sont signalées avant l’import.',
   },
   {
     label: 'Configurer', title: 'Donnez au plan les bonnes dimensions',
-    description: 'Dans « Structure du meuble », indiquez les éléments, les tablettes et les unités disponibles en largeur.',
-    points: ['Un élément mesure 1,33 m. Les demi-éléments sont possibles.', 'Choisissez de 4 à 9 tablettes et les unités par élément.', 'Cliquez sur « Appliquer la structure » après une modification.'],
+    description: 'Dans « Nouveau plan » ou les paramètres « Structure du meuble », indiquez les éléments, les tablettes et les unités disponibles en largeur.',
+    points: ['Un élément mesure 1,33 m. Les demi-éléments sont possibles.', 'Choisissez de 4 à 9 tablettes et les unités par élément.', 'Les réglages restent en attente jusqu’au clic sur « Régénérer le plan ».'],
     tip: 'Pour un demi-élément, sa capacité en unités est réglable séparément. Le quota du plan affiche l’espace restant.',
   },
   {
     label: 'Générer', title: 'Choisissez votre implantation',
-    description: 'Sélectionnez un type de plan et un niveau de regroupement, puis cliquez sur « Générer le plan ».',
+    description: window.plano ? 'Sélectionnez un type de plan et un niveau de regroupement, puis cliquez sur « Régénérer le plan ». Cette commande est aussi disponible dans Outils.' : 'Sélectionnez un type de plan et un niveau de regroupement, puis cliquez sur « Régénérer le plan ».',
     points: ['En descente : chaque groupe occupe toute la hauteur.', 'Par blocs : composez des zones sur plusieurs tablettes.', 'À l’article : travaillez référence par référence.'],
     tip: 'Avec « Pondérer selon les ventes », l’espace suit les ventes. Sans pondération, la répartition est à parts égales.',
   },
   {
     label: 'Ajuster', title: 'Gardez la main sur chaque bloc',
-    description: 'Sélectionnez un bloc pour afficher ses réglages dans la colonne droite. Déplacez-le à la souris et ajustez ses bords.',
+    description: 'Double-cliquez sur une descente, un bloc ou un article pour le modifier. Déplacez-le à la souris et ajustez ses bords.',
     points: ['En descente, modifiez aussi les unités dans les cartes sous le plan.', 'En mode blocs, glissez « Nouveau bloc » dans un emplacement libre.', 'Comparez les parts de linéaire et de ventes sous le plan.'],
-    tip: 'Ctrl + Z annule une action. Supprimer retire uniquement le bloc ou l’article sélectionné. Les ventes source restent conservées.',
+    tip: window.plano ? 'Ctrl + Z annule une action. Affichage → Assortiment ouvre la recherche et les filtres des références. Supprimer retire uniquement le bloc ou l’article sélectionné.' : 'Ctrl + Z annule une action. Le bouton Assortiment ouvre la recherche et les filtres des références. Supprimer retire uniquement le bloc ou l’article sélectionné.',
   },
   {
     label: 'Partager', title: 'Retrouvez et partagez votre travail',
-    description: 'Votre plan s’enregistre automatiquement sur cet ordinateur. « Mes plans » donne accès à votre bibliothèque.',
-    points: ['« Télécharger le PDF » produit une présentation du plan.', 'Le menu « … » propose l’export des données en CSV.', 'Exportez un fichier .plano pour transférer un projet modifiable.'],
-    tip: 'Ce tutoriel reste accessible depuis le bouton d’aide en haut à droite. Toutes ces fonctions sont disponibles hors ligne.',
+    description: window.plano ? 'Fichier → Enregistrer écrit votre plan dans un fichier .plano. Au premier enregistrement, choisissez son emplacement. Fichier → Ouvrir un plan permet de le retrouver.' : 'Enregistrer le plan télécharge un fichier .plano. Ouvrir un plan permet de retrouver ce fichier.',
+    points: window.plano ? ['Fichier → Exporter propose le PDF et l’image PNG du plan complet.', 'Le même menu permet d’exporter les données en CSV.', 'Fichier → Enregistrer sous crée un autre fichier .plano.'] : ['« Télécharger le PDF » produit une présentation du plan.', 'Le menu « … » permet d’enregistrer le plan .plano et d’exporter les données en CSV.', '« Télécharger l’image » enregistre le plan complet en PNG.'],
+    tip: window.plano ? 'Aide → Revoir le tutoriel permet de relancer ce parcours. Toutes ces fonctions sont disponibles hors ligne.' : 'Ce tutoriel reste accessible depuis le bouton d’aide en haut à droite. Toutes ces fonctions sont disponibles hors ligne.',
   },
 ] as const;
 
@@ -64,7 +64,7 @@ function TutorialVisual({ step }: { step: number }) {
       : step === 3 ? <><div className="tutorial-modes"><span><Columns3 size={16}/>Descente</span><span><LayoutGrid size={16}/>Blocs</span><span><Package size={16}/>Articles</span></div><MiniPlan/><div className="tutorial-floating-chip"><WandSparkles size={15}/>Répartition selon les ventes</div></>
       : step === 4 ? <><MiniPlan selected/><div className="tutorial-cursor"><MousePointer2 size={25}/></div><div className="tutorial-comparison"><div><span>Part de linéaire</span><strong>40 %</strong></div><div><span>Part de ventes</span><strong>48 %</strong></div></div><div className="tutorial-floating-chip"><MoveHorizontal size={15}/>Déplacer · Redimensionner</div></>
       : step === 5 ? <><div className="tutorial-report"><div className="tutorial-report-title"><div><span>MON PLANOGRAMME</span><strong>Conserves de légumes</strong></div><Download size={18}/></div><MiniPlan/><div className="tutorial-report-lines"><i/><i/><i/></div></div><div className="tutorial-export-formats"><span>PDF</span><span>CSV</span><span>.plano</span></div><div className="tutorial-floating-chip"><CheckCircle2 size={15}/>Enregistré sur cet ordinateur</div></>
-      : <><div className="tutorial-welcome-icon"><Sparkles size={30}/></div><MiniPlan/><div className="tutorial-floating-chip"><LockKeyhole size={15}/>Votre espace, 100 % hors ligne</div></>}
+      : <><div className="tutorial-welcome-icon"><Sparkles size={30}/></div><MiniPlan/><div className="tutorial-floating-chip"><LockKeyhole size={15}/>Vos plans, disponibles hors ligne</div></>}
     <div className="tutorial-visual-footnote">ILLUSTRATION · EXEMPLE DE PLAN</div>
   </div>;
 }

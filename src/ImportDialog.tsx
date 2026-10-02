@@ -32,7 +32,6 @@ export function ImportDialog({ onClose, onImport, initialMode = 'sales', initial
       const firstRow = Math.max(0, values[0].rows.findIndex(row => row.filter(Boolean).length >= 3));
       const suggested = suggestMapping(values[0].rows[firstRow] || []);
       setSheets(values); setFileName(file.name); setSheetIndex(0); setHeader(firstRow); setMapping(suggested); setSkipInvalid(false);
-      if (suggested.sales < 0) { setMetric('catalog'); setDestination('new'); }
     } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
   };
   useEffect(() => { if (initialFile) void read(initialFile); }, [initialFile]);
@@ -45,6 +44,7 @@ export function ImportDialog({ onClose, onImport, initialMode = 'sales', initial
 
   return <Modal title="Importer vos produits et ventes" subtitle="Les données restent sur cet ordinateur. Aucun fichier n’est envoyé en ligne." onClose={onClose} wide>
     {!sheets.length ? <div className="import-start">
+      <label className="field import-measure">Mesure des ventes<select value={metric} onChange={event => { const value = event.target.value as SalesMetric; setMetric(value); if (value === 'catalog') setDestination('new'); }}><option value="revenue">Chiffre d’affaires en euros</option><option value="units">Ventes en unités</option><option value="catalog">Catalogue sans ventes</option></select></label>
       <label className="file-drop" onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); void read(e.dataTransfer.files[0]); }}>
         <div className="large-icon"><UploadCloud size={32}/></div><h3>Déposez votre fichier ici</h3><p>ou cliquez pour choisir un fichier</p><span>CSV ou Excel XLSX · Jusqu’à 50 Mo</span>
         <input type="file" accept=".csv,.xlsx" onChange={e => void read(e.target.files?.[0])} hidden/>

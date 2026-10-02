@@ -3,7 +3,7 @@ import type { Block, Group, Grouping, Product, Project } from './types.ts';
 export const palette = ['#2764cf', '#177c83', '#aa6a31', '#7761b3', '#ad5278', '#547c48', '#56758c', '#93633f'];
 export const uid = () => crypto.randomUUID();
 export function newProject(): Project {
-  return { schemaVersion: 1, id: uid(), name: 'Nouveau plan', updatedAt: new Date().toISOString(), products: [], sourceName: '', sourceSheet: '', salesMetric: 'revenue', elements: 4, shelves: 6, unitsPerElement: 12, halfUnits: 6, viewMode: 'mass', groupBy: 'subsegment', targetSegment: '', weightedBySales: true, massUnits: {}, massOrder: [], blockPlacements: [], articlePlacements: [], customGroups: [], groupColors: {} };
+  return { schemaVersion: 1, id: uid(), name: 'Sans titre', updatedAt: new Date().toISOString(), products: [], sourceName: '', sourceSheet: '', salesMetric: 'revenue', elements: 4, shelves: 6, unitsPerElement: 12, halfUnits: 6, viewMode: 'mass', groupBy: 'subsegment', targetSegment: '', weightedBySales: true, massUnits: {}, massOrder: [], blockPlacements: [], articlePlacements: [], customGroups: [], groupColors: {} };
 }
 export const capacity = (p: Pick<Project, 'elements' | 'unitsPerElement' | 'halfUnits'>) => Math.floor(p.elements) * p.unitsPerElement + (p.elements % 1 ? p.halfUnits : 0);
 const scopeCache = new WeakMap<Project, Product[]>(), groupCache = new WeakMap<Project, Group[]>(), shareCache = new WeakMap<Project, Map<string, number>>();
@@ -149,15 +149,15 @@ export function parseNumber(value: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 export function normalizeProject(raw: unknown): Project {
-  if (!raw || typeof raw !== 'object') throw new Error('Le fichier ne contient pas un projet PlanoPilot.');
+  if (!raw || typeof raw !== 'object') throw new Error('Le fichier ne contient pas un plan PlanoPilot.');
   const data = raw as Record<string, unknown>;
-  if (data.schemaVersion !== undefined && data.schemaVersion !== 1) throw new Error('Cette version de projet n’est pas prise en charge.');
-  if (!Array.isArray(data.products) || typeof data.name !== 'string') throw new Error('Le projet est incomplet.');
+  if (data.schemaVersion !== undefined && data.schemaVersion !== 1) throw new Error('Cette version de plan n’est pas prise en charge.');
+  if (!Array.isArray(data.products) || typeof data.name !== 'string') throw new Error('Le plan est incomplet.');
   const p = { ...newProject(), ...structuredClone(data) } as Project;
   if ((p.viewMode as string) === 'block') p.viewMode = 'blocks';
   if ((p.groupBy as string) === 'reference') p.groupBy = 'sku';
   if (!p.id) p.id = uid();
-  if (typeof p.id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(p.id)) throw new Error('L’identifiant du projet est invalide.');
+  if (typeof p.id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(p.id)) throw new Error('L’identifiant du plan est invalide.');
   p.name = p.name.trim() || 'Plan sans titre';
   p.sourceName = typeof p.sourceName === 'string' ? p.sourceName : '';
   p.sourceSheet = typeof p.sourceSheet === 'string' ? p.sourceSheet : '';
@@ -208,11 +208,11 @@ export function normalizeProject(raw: unknown): Project {
   p.blockPlacements = [];
   const blockIds = new Set<string>();
   for (const b of blocks) {
-    if (!b || typeof b !== 'object') throw new Error('Le projet contient un bloc invalide.');
+    if (!b || typeof b !== 'object') throw new Error('Le plan contient un bloc invalide.');
     const legacyGroup = (b as unknown as { group?: string }).group;
     const associated = activeGroups.find(g => g.id === b.groupId || g.label === legacyGroup);
     const block = { ...b, id: b.id || uid(), groupId: associated?.id || null, label: typeof b.label === 'string' ? b.label : associated?.label || legacyGroup || 'Bloc', color: colorValid(b.color) ? b.color : associated?.color || '#2764cf' };
-    if (typeof block.id !== 'string' || blockIds.has(block.id) || !validBlock(p, block)) throw new Error('Le projet contient un bloc hors du meuble ou un chevauchement.');
+    if (typeof block.id !== 'string' || blockIds.has(block.id) || !validBlock(p, block)) throw new Error('Le plan contient un bloc hors du meuble ou un chevauchement.');
     p.blockPlacements.push(block); blockIds.add(block.id);
   }
   const occupiedArticles = new Set<string>(), articleIds = new Set<string>();
@@ -226,9 +226,9 @@ export function normalizeProject(raw: unknown): Project {
   return p;
 }
 export function demoProject(): Project {
-  const p = newProject(); p.name = 'Conserves de légumes · Enseigne A'; p.targetSegment = 'Conserves de légumes'; p.sourceName = 'Données de démonstration';
+  const p = newProject(); p.name = 'Exemple · Conserves de légumes'; p.targetSegment = 'Conserves de légumes'; p.sourceName = 'Données fictives de démonstration';
   const labels = ['Tomates', 'Maïs', 'Champignons', 'Légumes salades', 'Autres grains'];
   const sales = [74594, 61320, 47280, 53100, 152290];
-  p.products = labels.flatMap((subsegment, i) => Array.from({ length: [12, 9, 8, 10, 15][i] }, (_, j) => ({ id: uid(), sku: `REF-${i + 1}${String(j + 1).padStart(3, '0')}`, name: `${subsegment} ${j % 2 ? '400' : '250'} g`, brand: ['Maison Jardin', 'Bon Terroir', 'Marque enseigne'][j % 3], segment: 'Conserves de légumes', subsegment, sales: sales[i] / [12, 9, 8, 10, 15][i], quantity: 400 + j * 31, ours: j % 3 === 0 })));
+  p.products = labels.flatMap((subsegment, i) => Array.from({ length: [12, 9, 8, 10, 15][i] }, (_, j) => ({ id: uid(), sku: `REF-${i + 1}${String(j + 1).padStart(3, '0')}`, name: `${subsegment} ${j % 2 ? '400' : '250'} g`, brand: ['Marque A', 'Marque B', 'Marque C'][j % 3], segment: 'Conserves de légumes', subsegment, sales: sales[i] / [12, 9, 8, 10, 15][i], quantity: 400 + j * 31, ours: j % 3 === 0 })));
   return generate(p);
 }

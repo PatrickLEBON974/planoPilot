@@ -13,7 +13,7 @@ test('les exports CSV conservent les métriques et neutralisent les formules des
   assert.equal(Number(parsed.data[0].Unités), 48);
   assert.equal(parsed.data[0]['Part des ventes (%)'], '100,0000');
 });
-test('le PDF utilise les couleurs du projet, échappe le HTML et garde un titre propre', () => {
+test('le PDF utilise les couleurs du plan, échappe le HTML et garde un titre propre', () => {
   const p = { ...demoProject(), name: 'Plan <script>texte</script>' };
   const report = pdfPayload(p);
   assert.ok(report.html.includes('<title>Plan &lt;script&gt;texte&lt;/script&gt;</title>'));

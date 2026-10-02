@@ -54,7 +54,7 @@ test('un regroupement additionne les ventes et conserve chaque bloc non sélecti
   for (const group of groups.filter(g => !members.includes(g.id))) assert.equal(getGroups(next).find(g => g.id === group.id).color, group.color);
   assert.ok(Math.abs(linearShare(next, id) - members.reduce((sum, member) => sum + linearShare(p, member), 0)) < 1e-10);
 });
-test('le projet rouvert conserve implantations, couleurs et regroupements', () => {
+test('le plan rouvert conserve implantations, couleurs et regroupements', () => {
   const p = demoProject(), g = getGroups(p);
   const customized = mergeGroups(p, 'Autres marques', g.slice(0, 2).map(x => x.id), '#2857a7').project;
   const reopened = normalizeProject(JSON.parse(JSON.stringify(customized)));
