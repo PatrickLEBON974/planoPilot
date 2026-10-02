@@ -7,7 +7,6 @@ export function projectWithImport(project: Project, products: Product[], sourceN
   const catalog = salesMetric === 'catalog';
   return generate({ ...project, products, sourceName, sourceSheet, salesMetric,
     weightedBySales: !catalog && project.weightedBySales,
-    groupBy: catalog ? 'segment' : project.groupBy,
     targetSegment: catalog ? '' : [...new Set(products.map(x => x.segment))].sort()[0] || '',
     massUnits: {}, massOrder: [], blockPlacements: [], articlePlacements: [], customGroups: [], groupColors: {},
   });

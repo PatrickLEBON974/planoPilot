@@ -13,7 +13,7 @@ Les plans sont des fichiers `.plano` enregistrés à l’emplacement de votre ch
 Un tutoriel en six étapes s’ouvre à la première utilisation. Sa progression est conservée sur cet ordinateur si l’application est fermée pendant le parcours. **Passer le tutoriel**, Échap ou sa fermeture désactivent le lancement automatique. Le menu **Aide → Revoir le tutoriel** permet de le revoir à tout moment. Ce parcours ne modifie pas vos plans.
 
 1. Créer un plan et choisir sa structure, son mode d’implantation et son regroupement, ou ouvrir l’exemple depuis l’accueil.
-2. Importer un CSV ou un XLSX depuis **Fichier → Importer dans le plan**. Choisir l’onglet, la ligne des en-têtes, la mesure des ventes et les colonnes.
+2. Importer un CSV ou un XLSX depuis **Fichier → Données de ventes** ou **Catalogue de produits**. Choisir l’onglet, la ligne des en-têtes, la mesure des ventes et les colonnes.
 3. Corriger le fichier si des lignes sont invalides, ou autoriser explicitement leur exclusion.
 4. Choisir le périmètre et configurer les éléments, tablettes et unités.
 5. Choisir le mode et le niveau de regroupement, puis générer le plan.
@@ -24,11 +24,13 @@ Un tutoriel en six étapes s’ouvre à la première utilisation. Sa progression
 
 **Fichier → Plans récents** ouvre un tiroir des vingt derniers fichiers ouverts ou enregistrés, avec leur nom et leur dossier. La liste conserve uniquement leurs chemins et dates d’utilisation ; elle ne crée aucune copie des plans. Les fichiers déplacés ou supprimés sont signalés comme introuvables. Retirer une entrée de cette liste conserve le fichier sur disque.
 
-**Fichier → Ouvrir un plan (.plano)** charge un plan complet avec ses données, ses réglages et son implantation enregistrée. **Fichier → Importer dans le plan** lit des produits et des ventes depuis un CSV ou un XLSX pour créer un nouveau plan ou remplacer l’assortiment et l’implantation du plan actuel, selon la destination choisie dans l’assistant.
+**Fichier → Ouvrir un plan (.plano)** charge un plan complet avec ses données, ses réglages et son implantation enregistrée. **Fichier → Données de ventes** et **Catalogue de produits** lisent des produits et des ventes depuis un CSV ou un XLSX pour créer un nouveau plan ou remplacer l’assortiment et l’implantation du plan actuel, selon la destination choisie dans l’assistant.
 
 Un clic sur le planogramme sélectionne un élément pour le déplacer ou le redimensionner. Un **double-clic** ouvre sa fenêtre d’édition, avec les réglages à gauche et un aperçu du meuble à droite : ajuster les unités d’une descente, les dimensions et le groupe d’un bloc, ou la référence et la position d’un article, puis choisir **Appliquer** ou **Annuler**. L’aperçu suit les dimensions, la position et la couleur pendant la saisie. Les références du groupe se consultent dans une section repliable. **Appliquer** devient disponible après une modification valide ; les actions restent visibles sur une petite fenêtre. Les emplacements occupés et les dimensions hors du meuble sont refusés.
 
 Sans plan ouvert, les colonnes latérales sont masquées. **Nouveau plan** propose les dimensions du meuble, les capacités, le mode, le regroupement et la pondération sans demander de nom. Le nom affiché provient uniquement du fichier choisi à l’enregistrement ; le planogramme n’affiche aucun nom avant l’ouverture ou l’enregistrement d’un fichier. Le bouton **Paramètres** réduit ou affiche la colonne de gauche, en conservant les réglages en cours de saisie.
+
+**Fichier → Paramètres** définit la structure par défaut du meuble, le type d’implantation et le niveau de regroupement des nouveaux plans. **Enregistrer** mémorise ces choix après la fermeture de l’application ; **Annuler** abandonne les changements de cette fenêtre. Ils sont proposés dans **Nouveau plan** et utilisés pour les nouveaux plans créés par un import ou un premier ajout Open Food Facts. Les imports de catalogues respectent aussi le regroupement choisi. Dans la prévisualisation navigateur, l’icône **Paramètres** donne accès à ces mêmes réglages.
 
 Le panneau de droite est masqué par défaut. **Affichage → Assortiment (panneau de droite)** affiche l’assortiment, sa recherche et ses filtres. Ce choix est conservé sur cet ordinateur. L’édition reste accessible au double-clic quel que soit l’affichage du panneau.
 
@@ -36,7 +38,7 @@ La barre de menus de bureau centralise les commandes générales. Les commandes 
 
 | Menu | Commandes |
 | --- | --- |
-| **Fichier** | Nouveau plan, ouverture, Plans récents, Importer dans le plan (ventes et catalogues), Enregistrer, Enregistrer sous, exports PDF/PNG/CSV, quitter. |
+| **Fichier** | Nouveau plan, ouverture, Plans récents, Données de ventes, Catalogue de produits, Enregistrer, Enregistrer sous, exports PDF/PNG/CSV, Paramètres, quitter. |
 | **Édition** | Annuler/rétablir, couper/copier/coller le texte, modifier, dupliquer ou supprimer la sélection. |
 | **Affichage** | Assortiment, grille des unités, agrandir/réduire/ajuster le plan, plein écran. |
 | **Outils** | Régénérer le plan, créer un regroupement, composer un bloc, modèles d’import CSV, rechercher sur Open Food Facts. |
@@ -50,7 +52,7 @@ La commande **Fichier → Exporter → Image PNG** enregistre un PNG en haute r�
 
 ## Imports, catalogues et modèles
 
-Le menu **Fichier → Importer dans le plan** regroupe l’import de catalogues et l’import de ventes. **Outils → Modèles d’import CSV** propose deux fichiers vierges : un modèle de catalogue et un modèle de ventes avec chiffre d’affaires. Aucun catalogue d’entreprise n’est intégré à l’interface. L’assistant accepte CSV et XLSX, propose l’association des colonnes, affiche un aperçu et signale les lignes invalides. Pour un import de ventes, le choix **Chiffre d’affaires en euros** est affiché par défaut dès l’ouverture. Il reste sélectionné si aucune colonne de ventes n’est détectée : choisissez alors la colonne appropriée ou passez explicitement en **Catalogue sans ventes**. Les entrées de menu dédiées aux catalogues ouvrent directement ce dernier mode.
+Le menu **Fichier** propose directement **Données de ventes** et **Catalogue de produits**. **Outils → Modèles d’import CSV** propose deux fichiers vierges : un modèle de catalogue et un modèle de ventes avec chiffre d’affaires. Aucun catalogue d’entreprise n’est intégré à l’interface. L’assistant accepte CSV et XLSX, propose l’association des colonnes, affiche un aperçu et signale les lignes invalides. Pour un import de ventes, le choix **Chiffre d’affaires en euros** est affiché par défaut dès l’ouverture. Il reste sélectionné si aucune colonne de ventes n’est détectée : choisissez alors la colonne appropriée ou passez explicitement en **Catalogue sans ventes**. Les entrées de menu dédiées aux catalogues ouvrent directement ce dernier mode.
 
 Le mode **Catalogue sans ventes** exige uniquement la désignation, la marque et le segment. Il conserve aussi la référence, le sous-segment, le conditionnement, le fournisseur, l’URL source et les notes. Les ventes sont affichées comme non renseignées, les parts de ventes et les écarts sont indisponibles, et la pondération par les ventes est désactivée. Les exports CSV laissent les ventes vides et les PDF indiquent leur absence. Les références répétées dans un catalogue sont exclues après la première occurrence ; les imports de ventes conservent leur comportement d’addition.
 
@@ -111,6 +113,7 @@ Sur Linux, les tests de bureau lancent automatiquement Xvfb et Electron sur un �
 - `electron/plan-files.cjs` : fichier actif et enregistrements atomiques.
 - `electron/recent-plans.cjs` : historique des chemins de fichiers.
 - `src/NewPlanDialog.tsx` et `src/PlanParameters.tsx` : création et réglages du meuble.
+- `src/PreferencesDialog.tsx` et `src/planSettings.ts` : paramètres par défaut des nouveaux plans.
 - `src/RecentPlansDrawer.tsx` : tiroir des fichiers récents.
 - `src/usePlanFile.tsx` : suivi des modifications et confirmation avant de changer de fichier.
 - `electron/preload.cjs` : API limitée entre l’interface et Electron.

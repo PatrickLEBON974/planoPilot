@@ -15,7 +15,7 @@ export interface Project {
 export interface Group { id: string; label: string; sales: number; share: number; references: number; products: Product[]; color: string; }
 export interface OpenedPlan { project: unknown; filePath: string; }
 export interface RecentPlan { filePath: string; name: string; lastUsed: string; available: boolean; }
-export type MenuAction = 'new' | 'open' | 'recent' | 'save' | 'save-as' | 'export-pdf' | 'export-image' | 'export-csv' | 'catalog-resources' | 'off-search' | 'undo' | 'redo' | 'edit-selection' | 'duplicate' | 'delete' | 'toggle-panel' | 'toggle-grid' | 'zoom-in' | 'zoom-out' | 'zoom-reset' | 'import-sales' | 'import-catalog' | 'generate' | 'create-group' | 'compose-block' | 'help' | 'tutorial' | 'shortcuts' | 'demo';
+export type MenuAction = 'new' | 'open' | 'recent' | 'save' | 'save-as' | 'preferences' | 'export-pdf' | 'export-image' | 'export-csv' | 'catalog-resources' | 'off-search' | 'undo' | 'redo' | 'edit-selection' | 'duplicate' | 'delete' | 'toggle-panel' | 'toggle-grid' | 'zoom-in' | 'zoom-out' | 'zoom-reset' | 'import-sales' | 'import-catalog' | 'generate' | 'create-group' | 'compose-block' | 'help' | 'tutorial' | 'shortcuts' | 'demo';
 export interface MenuState { canGenerate: boolean; hasDocument: boolean; hasData: boolean; canUndo: boolean; canRedo: boolean; canEdit: boolean; canMutate: boolean; canCompose: boolean; dialogOpen: boolean; editingText: boolean; showRightPanel: boolean; showGrid: boolean; canZoomIn: boolean; canZoomOut: boolean; exporting: boolean; exportingImage: boolean; }
 export interface DesktopAPI {
   searchOpenFoodFacts(request: OpenFoodFactsRequest): Promise<OpenFoodFactsResult>;

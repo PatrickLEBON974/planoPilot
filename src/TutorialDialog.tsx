@@ -11,7 +11,7 @@ const steps = [
   },
   {
     label: 'Importer', title: 'Commencez avec vos données',
-    description: window.plano ? 'Dans Fichier → Importer dans le plan, choisissez des données de ventes ou un catalogue. Les formats CSV et Excel (.xlsx) sont acceptés.' : 'Cliquez sur « Importer mes données » à l’accueil ou sur « Importer un fichier » dans les paramètres. Les formats CSV et Excel (.xlsx) sont acceptés.',
+    description: window.plano ? 'Dans Fichier, choisissez « Données de ventes » ou « Catalogue de produits ». Les formats CSV et Excel (.xlsx) sont acceptés.' : 'Cliquez sur « Importer mes données » à l’accueil ou sur « Importer un fichier » dans les paramètres. Les formats CSV et Excel (.xlsx) sont acceptés.',
     points: ['Avec Excel, choisissez l’onglet et la ligne des en-têtes.', 'Associez les colonnes : produit, marque, segment et ventes si disponibles.', 'Choisissez le périmètre à implanter après l’import.'],
     tip: 'Le chiffre d’affaires est proposé par défaut. Choisissez les ventes en unités ou un catalogue sans ventes si nécessaire. Les lignes invalides sont signalées avant l’import.',
   },

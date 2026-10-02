@@ -257,6 +257,97 @@ test('nouveau plan : réglages sans nom, colonne réductible et tiroir des fichi
     assert.deepEqual(errors, []);
   } finally { if (app) await closeApp(app); }
 });
+test('paramètres par défaut : menu Fichier, annulation, nouveaux plans, stockage et réouverture', { timeout: 120000 }, async () => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'planopilot-defaults-'));
+  const existingFile = path.join(directory, 'ancienne-implantation.plano'), original = demoProject();
+  await fs.writeFile(existingFile, JSON.stringify(original));
+  const options = { executablePath: require('electron'), args: ['.', '--disable-gpu'], cwd: path.resolve('.'), env: { ...process.env, PLANOPILOT_DATA_DIR: directory } };
+  const first = { elements: 2.5, shelves: 5, unitsPerElement: 13, halfUnits: 7, viewMode: 'articles', groupBy: 'brand' };
+  const second = { elements: 1.5, shelves: 9, unitsPerElement: 10, halfUnits: 6, viewMode: 'blocks', groupBy: 'sku' };
+  let app;
+  const fill = async (dialog, value) => {
+    await dialog.getByLabel('Nombre d’éléments', { exact: true }).fill(String(value.elements));
+    await dialog.getByLabel('Tablettes', { exact: true }).selectOption(String(value.shelves));
+    await dialog.getByLabel('Unités / élément', { exact: true }).fill(String(value.unitsPerElement));
+    await dialog.getByLabel('Unités du demi-élément', { exact: true }).fill(String(value.halfUnits));
+    await dialog.getByLabel('Type d’implantation', { exact: true }).selectOption(value.viewMode);
+    await dialog.getByLabel('Niveau de regroupement', { exact: true }).selectOption(value.groupBy);
+  };
+  const check = async (dialog, value) => {
+    for (const [label, field] of [['Nombre d’éléments', 'elements'], ['Tablettes', 'shelves'], ['Unités / élément', 'unitsPerElement'], ['Unités du demi-élément', 'halfUnits'], ['Type d’implantation', 'viewMode'], ['Niveau de regroupement', 'groupBy']]) await expect(dialog.getByLabel(label, { exact: true })).toHaveValue(String(value[field]));
+  };
+  try {
+    app = await launchDesktop(options, null);
+    let page = await app.firstWindow(); await dismissTutorial(page);
+    assert.equal(await page.locator('.app-save-status').count(), 0);
+    assert.ok(await app.evaluate(({ Menu }) => Menu.getApplicationMenu().items.find(item => item.label === 'Fichier').submenu.items.some(item => item.id === 'preferences')));
+    await clickNativeMenu(app, 'preferences');
+    let preferences = page.getByRole('dialog', { name: 'Paramètres', exact: true }); await preferences.waitFor();
+    await fill(preferences, first);
+    await preferences.getByRole('button', { name: 'Annuler', exact: true }).click();
+    await clickNativeMenu(app, 'preferences');
+    await expect(preferences.getByLabel('Nombre d’éléments', { exact: true })).toHaveValue('4');
+    await expect(preferences.getByLabel('Type d’implantation', { exact: true })).toHaveValue('mass');
+    await expect(preferences.getByLabel('Niveau de regroupement', { exact: true })).toHaveValue('subsegment');
+    await fill(preferences, first);
+    await preferences.getByLabel('Unités / élément', { exact: true }).fill('0');
+    await expect(preferences.getByRole('button', { name: 'Enregistrer', exact: true })).toBeDisabled();
+    await fill(preferences, first);
+    await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(1100, 720));
+    await fs.mkdir('screenshots', { recursive: true }); await page.screenshot({ path: 'screenshots/23-parametres-par-defaut.png' });
+    const footer = await preferences.locator('.modal-footer').boundingBox();
+    assert.ok(footer.y + footer.height <= await page.evaluate(() => innerHeight));
+    await preferences.getByRole('button', { name: 'Enregistrer', exact: true }).click();
+    await preferences.waitFor({ state: 'hidden' });
+    assert.equal(await page.locator('.app-save-status').count(), 0);
+    await clickNativeMenu(app, 'new');
+    let create = page.getByRole('dialog', { name: 'Créer un nouveau plan', exact: true }); await check(create, first);
+    await create.getByLabel('Type d’implantation', { exact: true }).selectOption('mass');
+    await create.getByRole('button', { name: 'Annuler', exact: true }).click();
+    await clickNativeMenu(app, 'new'); await check(create, first);
+    await create.getByRole('button', { name: 'Créer le plan', exact: true }).click();
+    await page.locator('.save-status.unsaved').waitFor();
+    await clickNativeMenu(app, 'save'); await page.locator('.save-status.saved').waitFor();
+    const created = await snapshotPlan(page);
+    for (const key of Object.keys(first)) assert.equal(created[key], first[key]);
+    await clickNativeMenu(app, 'preferences'); await fill(preferences, second);
+    await page.evaluate(() => {
+      const original = Storage.prototype.setItem;
+      window.restoreDefaultStorage = () => { Storage.prototype.setItem = original; };
+      Storage.prototype.setItem = function(key, value) { if (key === 'planopilot:plan-defaults:v1') throw new DOMException('Storage unavailable', 'QuotaExceededError'); return original.call(this, key, value); };
+    });
+    await preferences.getByRole('button', { name: 'Enregistrer', exact: true }).click();
+    await expect(preferences.getByRole('alert')).toHaveText('Les paramètres n’ont pas pu être enregistrés. Réessayez.');
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('planopilot:plan-defaults:v1'))), first);
+    await page.evaluate(() => window.restoreDefaultStorage());
+    await preferences.getByRole('button', { name: 'Enregistrer', exact: true }).click();
+    await preferences.waitFor({ state: 'hidden' });
+    await expect(page.locator('.save-status.saved')).toBeVisible();
+    await expect(page.locator('.settings-panel').getByLabel('Niveau de regroupement', { exact: true })).toHaveValue('brand');
+    assert.deepEqual(await snapshotPlan(page), created);
+    await app.evaluate(({ dialog }, file) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [file] }); }, existingFile);
+    await clickNativeMenu(app, 'open');
+    await expect(page.locator('.board-toolbar h2')).toHaveAttribute('title', 'ancienne-implantation');
+    await expect(page.locator('.settings-panel').getByLabel('Niveau de regroupement', { exact: true })).toHaveValue(original.groupBy);
+    await expect(page.locator('.save-status.saved')).toBeVisible();
+    assert.deepEqual(JSON.parse(await fs.readFile(existingFile, 'utf8')), original);
+    await closeApp(app); app = undefined;
+    app = await launchDesktop(options, null); page = await app.firstWindow();
+    await clickNativeMenu(app, 'preferences'); preferences = page.getByRole('dialog', { name: 'Paramètres', exact: true }); await check(preferences, second);
+    await preferences.getByRole('button', { name: 'Annuler', exact: true }).click();
+    await clickNativeMenu(app, 'new'); create = page.getByRole('dialog', { name: 'Créer un nouveau plan', exact: true }); await check(create, second);
+    await create.getByRole('button', { name: 'Annuler', exact: true }).click();
+    await clickNativeMenu(app, 'import-catalog');
+    await page.locator('.file-drop input').setInputFiles({ name: 'catalogue.csv', mimeType: 'text/csv', buffer: Buffer.from('Référence;Désignation;Marque;Segment;Sous-segment\nDEF-1;Produit A;Marque A;Épicerie;Conserves\nDEF-2;Produit B;Marque B;Épicerie;Conserves\n') });
+    await page.getByText('2 lignes prêtes à être importées').waitFor();
+    await page.getByRole('button', { name: 'Importer les données', exact: true }).click();
+    await page.locator('.catalogue-notice').waitFor();
+    await clickNativeMenu(app, 'save'); await page.locator('.save-status.saved').waitFor();
+    const imported = await snapshotPlan(page);
+    for (const key of Object.keys(second)) assert.equal(imported[key], second[key]);
+    assert.equal(imported.salesMetric, 'catalog'); assert.equal(imported.products.length, 2);
+  } finally { if (app) await closeApp(app); }
+});
 test('paramètres : sélecteurs sans recalcul, régénération manuelle, annulation et historique', { timeout: 120000 }, async () => {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'planopilot-manual-settings-'));
   const products = [
@@ -361,7 +452,8 @@ test('bureau : double-clic, édition annulable, collisions et menus natifs', { t
     assert.equal(await page.locator('.workspace-header, .breadcrumb').count(), 0);
     await expect(page.locator('.board-toolbar h2')).toContainText('initial');
     for (const selector of ['.nav-library', '.workspace-actions', '.history-actions', '.board-tools', '.composer-settings', '.content-heading > button', '.avatar']) assert.equal(await page.locator(selector).count(), 0, `Doublon retiré : ${selector}`);
-    assert.deepEqual(await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('imports').submenu.items.map(item => item.id)), ['import-sales', 'import-catalog']);
+    assert.equal(await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('imports')), null);
+    assert.deepEqual(await app.evaluate(({ Menu }) => Menu.getApplicationMenu().items.find(item => item.label === 'Fichier').submenu.items.filter(item => item.id?.startsWith('import-')).map(item => item.id)), ['import-sales', 'import-catalog']);
     assert.deepEqual(await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('exports').submenu.items.map(item => item.id)), ['export-pdf', 'export-image', 'export-csv']);
     assert.equal(await page.locator('.right-panel').count(), 0);
     assert.equal(await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('undo').enabled), false);
@@ -695,7 +787,7 @@ test('modèles CSV : téléchargement, import d’un catalogue externe dans un n
     await page.getByText('3 lignes prêtes à être importées').waitFor();
     await page.getByRole('button', { name: 'Importer les données', exact: true }).click();
     await page.locator('.catalogue-notice').waitFor();
-    const drinks = page.locator('.group-card').filter({ has: page.getByRole('heading', { name: 'Boissons', exact: true }) });
+    const drinks = page.locator('.group-card').filter({ has: page.getByRole('heading', { name: 'Jus', exact: true }) });
     assert.equal(await drinks.locator('.group-content-list > li').count(), 2);
     assert.ok((await drinks.locator('.group-contents').textContent()).includes('Jus de pomme'));
     assert.ok((await drinks.locator('.group-contents').textContent()).includes('Jus d’orange'));

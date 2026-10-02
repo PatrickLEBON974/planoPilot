@@ -38,9 +38,12 @@ test('le fichier Royal Bourbon est importable sans erreurs et reste intact aprè
   assert.deepEqual(result.errors, []); assert.equal(result.duplicates, 0); assert.equal(result.products.length, metadata.entries);
   assert.ok(result.products.every(p => p.sku.startsWith('RBI-WEB-') && p.sourceUrl.startsWith('https://') && p.sales === 0 && p.quantity === undefined && p.ours === null));
   assert.equal(new Set(result.products.map(p => p.brand)).size, 5);
-  const project = projectWithImport(newProject(), result.products, file.name, sheet.name, 'catalog');
+  const project = projectWithImport({ ...newProject(), groupBy: 'segment' }, result.products, file.name, sheet.name, 'catalog');
   assert.equal(project.weightedBySales, false); assert.equal(project.targetSegment, ''); assert.equal(project.groupBy, 'segment');
   assert.equal(getGroups(project).length, 11); assert.equal(Object.values(project.massUnits).reduce((a, b) => a + b, 0), capacity(project));
+  const configured = projectWithImport({ ...newProject(), elements: 2.5, shelves: 5, viewMode: 'blocks', groupBy: 'brand' }, result.products, file.name, sheet.name, 'catalog');
+  assert.equal(configured.elements, 2.5); assert.equal(configured.shelves, 5); assert.equal(configured.viewMode, 'blocks'); assert.equal(configured.groupBy, 'brand');
+  assert.equal(getGroups(configured).length, 5);
   const reopened = normalizeProject(JSON.parse(JSON.stringify(project)));
   assert.equal(reopened.salesMetric, 'catalog'); assert.equal(reopened.weightedBySales, false); assert.deepEqual(reopened.products, result.products);
 });

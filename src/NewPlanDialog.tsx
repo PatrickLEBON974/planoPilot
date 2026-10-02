@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Modal } from './Modal';
 import { PlanStructureFields, validStructure } from './PlanParameters';
-import { newProject } from './domain';
+import { newPlanWithDefaults, type PlanDefaults } from './planSettings';
 import { groupingLabels, modeLabels } from './format';
 import type { Grouping, Project, ViewMode } from './types';
 
-export function NewPlanDialog({ onClose, onCreate, busy }: { onClose: () => void; onCreate: (plan: Project) => Promise<boolean>; busy: boolean }) {
-  const [plan, setPlan] = useState(newProject);
+export function NewPlanDialog({ defaults, onClose, onCreate, busy }: { defaults: PlanDefaults; onClose: () => void; onCreate: (plan: Project) => Promise<boolean>; busy: boolean }) {
+  const [plan, setPlan] = useState(() => newPlanWithDefaults(defaults));
   return <Modal title="Créer un nouveau plan" subtitle="Réglez le meuble et l’implantation. Le nom du fichier sera choisi lors de l’enregistrement." onClose={onClose} wide className="new-plan-dialog">
     <form onSubmit={event => { event.preventDefault(); if (validStructure(plan) && !busy) void onCreate({ ...plan, name: 'Sans titre' }); }}>
       <div className="new-plan-body">

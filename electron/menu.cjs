@@ -14,10 +14,8 @@ function createAppMenu(getWindow) {
       item('new', 'Nouveau plan', 'CommandOrControl+N'),
       item('open', 'Ouvrir un plan (.plano)…', 'CommandOrControl+O'),
       item('recent', 'Plans récents…'),
-      { id: 'imports', label: 'Importer dans le plan', submenu: [
-        item('import-sales', 'Données de ventes…'),
-        item('import-catalog', 'Catalogue de produits…'),
-      ] },
+      item('import-sales', 'Données de ventes…'),
+      item('import-catalog', 'Catalogue de produits…'),
       { type: 'separator' },
       item('save', 'Enregistrer', 'CommandOrControl+S'),
       item('save-as', 'Enregistrer sous…', 'CommandOrControl+Shift+S'),
@@ -26,6 +24,8 @@ function createAppMenu(getWindow) {
         item('export-image', 'Image PNG…'),
         item('export-csv', 'Données CSV…'),
       ] },
+      { type: 'separator' },
+      item('preferences', 'Paramètres…', 'CommandOrControl+,'),
       { type: 'separator' },
       { label: 'Quitter', accelerator: 'CommandOrControl+Q', click: () => getWindow()?.close() },
     ] },
@@ -68,7 +68,7 @@ function createAppMenu(getWindow) {
     state = Object.fromEntries(Object.entries(next).filter(([, value]) => typeof value === 'boolean'));
     const available = !state.dialogOpen, editable = available && !state.editingText;
     const enable = (id, value) => { menu.getMenuItemById(id).enabled = Boolean(value); };
-    for (const id of ['new', 'open', 'recent', 'save', 'save-as', 'exports', 'imports', 'import-sales', 'import-catalog', 'catalog-resources', 'off-search', 'help', 'tutorial', 'shortcuts', 'demo', 'toggle-panel']) enable(id, available);
+    for (const id of ['new', 'open', 'recent', 'save', 'save-as', 'exports', 'preferences', 'import-sales', 'import-catalog', 'catalog-resources', 'off-search', 'help', 'tutorial', 'shortcuts', 'demo', 'toggle-panel']) enable(id, available);
     for (const id of ['save', 'save-as', 'exports', 'toggle-panel']) enable(id, available && state.hasDocument);
     enable('undo', state.editingText || (available && state.canUndo));
     enable('redo', state.editingText || (available && state.canRedo));

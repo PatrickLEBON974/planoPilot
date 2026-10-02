@@ -1,12 +1,8 @@
 import { Ruler } from 'lucide-react';
 import { capacity } from './domain';
 import { number } from './format';
-import type { Project } from './types';
-
-export type PlanStructure = Pick<Project, 'elements' | 'shelves' | 'unitsPerElement' | 'halfUnits'>;
-export type PlanSettings = PlanStructure & Pick<Project, 'groupBy' | 'targetSegment'>;
-export const planSettings = (project: Project): PlanSettings => ({ elements: project.elements, shelves: project.shelves, unitsPerElement: project.unitsPerElement, halfUnits: project.halfUnits, groupBy: project.groupBy, targetSegment: project.targetSegment });
-export const validStructure = (value: PlanStructure) => value.elements >= .5 && value.elements <= 15 && Number.isInteger(value.elements * 2) && value.shelves >= 4 && value.shelves <= 9 && Number.isInteger(value.shelves) && value.unitsPerElement >= 1 && value.unitsPerElement <= 100 && Number.isInteger(value.unitsPerElement) && value.halfUnits >= 1 && value.halfUnits <= 100 && Number.isInteger(value.halfUnits);
+import type { PlanStructure } from './planSettings';
+export { planSettings, validStructure, type PlanStructure, type PlanSettings } from './planSettings';
 
 export function PlanStructureFields({ value, onChange }: { value: PlanStructure; onChange: (value: PlanStructure) => void }) {
   return <>

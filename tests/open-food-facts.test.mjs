@@ -111,7 +111,8 @@ test('ajouter une référence conserve les ventes et implantations existantes, p
   assert.deepEqual(next.products.slice(0, -1), snapshot.products); assert.deepEqual(p, snapshot);
   assert.deepEqual(normalizeProject(JSON.parse(JSON.stringify(next))).products, next.products);
   assert.throws(() => appendOpenFoodFactsProduct(next, product), /déjà dans l’assortiment/);
-  const catalog = appendOpenFoodFactsProduct(newProject(), { ...product, sales: 0 });
+  const catalog = appendOpenFoodFactsProduct({ ...newProject(), elements: 2.5, shelves: 5, viewMode: 'blocks', groupBy: 'brand' }, { ...product, sales: 0 });
   assert.equal(catalog.salesMetric, 'catalog'); assert.equal(catalog.weightedBySales, false);
+  assert.equal(catalog.elements, 2.5); assert.equal(catalog.shelves, 5); assert.equal(catalog.viewMode, 'blocks'); assert.equal(catalog.groupBy, 'brand');
   assert.equal(catalog.sourceName, 'Open Food Facts'); assert.ok(catalog.articlePlacements.length);
 });

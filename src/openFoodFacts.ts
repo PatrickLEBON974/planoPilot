@@ -17,5 +17,5 @@ export function appendOpenFoodFactsProduct(p: Project, product: Product): Projec
   if (p.products.some(existing => existing.sku === product.sku)) throw new Error('Cette référence est déjà dans l’assortiment.');
   const next = { ...p, products: [...p.products, product] };
   if (p.products.length) return next;
-  return generate({ ...next, salesMetric: 'catalog', weightedBySales: false, groupBy: 'segment', targetSegment: '', sourceName: 'Open Food Facts', sourceSheet: '' });
+  return generate({ ...next, salesMetric: 'catalog', weightedBySales: false, targetSegment: '', sourceName: 'Open Food Facts', sourceSheet: '' });
 }
